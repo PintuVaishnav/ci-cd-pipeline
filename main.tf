@@ -1,22 +1,17 @@
-terraform {
-  required_providers {
-    minikube = {
-      source  = "scott-the-programmer/minikube"
-      version = "0.4.2"
-    }
+resource "google_container_cluster" "primary" {
+  name               = var.cluster_name
+  location           = var.zone
+  initial_node_count = var.node_count
+
+  node_config {
+    machine_type = var.node_machine_type
   }
 }
 
-provider "minikube" {
-  kubernetes_version = "v1.33.1"
+provider "kubernetes" {
+  host                   = "https://${google_container_cluster.primary.endpoint}"
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(google_container_cluster.primary.master_auth[0].cluster_ca_certificate)
 }
 
-
-resource "minikube_cluster" "minikube_docker" {
-  driver       = "docker"
-  cluster_name = "pipeline-project"
-  addons       = [
-    "default-storageclass",
-    "storage-provisioner"
-  ]
-}
+data "google_client_config" "default" {}

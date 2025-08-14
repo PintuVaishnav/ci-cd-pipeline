@@ -1,7 +1,21 @@
-provider "kubernetes" {
-  host = minikube_cluster.minikube_docker.host
-  client_certificate = minikube_cluster.minikube_docker.client_certificate
-  client_key = minikube_cluster.minikube_docker.client_key
-  cluster_ca_certificate = minikube_cluster.minikube_docker.cluster_ca_certificate
-  
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "5.31.1"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "2.27.0"
+    }
+  }
+  backend "local" {
+    path = "./terraform.tfstate"
+  }
+}
+
+provider "google" {
+  project = "gentle-broker-469013-d6" # change to your project ID
+  region  = "us-central1"
+  zone    = "us-central1-a"
 }
